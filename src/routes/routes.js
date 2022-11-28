@@ -25,8 +25,31 @@ router.post('/signin', passport.authenticate('local-signin', {
     failureRedirect: '/signup',
     passReqToCallback: true
 }));
+//Aplicando middleware Lanza Error
+/*
+router.use((req, res, next) => {
+    isAuth(req, res, next);
+    next();
+});
+*/
 //Extra perfil
-router.get('/profile', (req, res,next) => {
+router.get('/profile',isAuth,(req, res,next) => {
     res.render('profile');
 });
+//Cerrar sesion
+router.get('/logout',isAuth, (req, res,next) => {
+    req.logout(function(err) {
+        if (err) { return next(err); }
+        res.redirect('/signin');
+      });
+});
+//Middleware
+function isAuth(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/signin');
+}
+
+
 module.exports = router;
